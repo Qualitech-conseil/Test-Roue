@@ -12,9 +12,30 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: #f5f5f5;
+      justify-content: flex-start;
+      min-height: 100vh;
+      background: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat fixed;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: -1;
+    }
+    #logo {
+      margin-top: 20px;
+      max-width: 150px;
+    }
+    #titleMessage {
+      margin: 10px;
+      font-size: 18px;
+      text-align: center;
+      font-weight: bold;
+      color: white;
     }
     #wheelContainer {
       position: relative;
@@ -24,7 +45,7 @@
     }
     #indicator {
       position: absolute;
-      bottom: -20px;
+      top: -30px;
       left: 50%;
       transform: translateX(-50%) rotate(180deg);
       width: 0;
@@ -91,6 +112,9 @@
 </head>
 <body>
 
+  <img id="logo" src="logo.png" alt="Logo">
+  <div id="titleMessage">Jouer et tenter votre chance en nous laissant un avis google</div>
+
   <div id="wheelContainer">
     <div id="indicator"></div>
     <canvas id="wheelCanvas" width="400" height="400"></canvas>
@@ -137,8 +161,8 @@
         ctx.fillStyle = colors[i];
         ctx.fill();
 
-        for (let j = 0; j < 5; j++) {
-          const innerAngle = i * step + (j + 1) * (step / 6);
+        for (let j = 0; j < 36; j++) {
+          const innerAngle = i * step + (j + 1) * (step / 37);
           const x1 = radius + Math.cos(innerAngle) * (radius - 10);
           const y1 = radius + Math.sin(innerAngle) * (radius - 10);
           ctx.beginPath();
@@ -216,7 +240,9 @@
     function openAvisGoogle() {
       window.open("https://www.google.com/maps/place/Restaurant/@0,0,17z/data=!4m6!3m5!1s0x0:0x0!8m2!3d0!4d0!16s%2Fg%2F11c4z9kw0t", "_blank");
       document.getElementById("btnAvis").classList.add("hidden");
-      document.getElementById("btnPlay").classList.remove("hidden");
+      setTimeout(() => {
+        document.getElementById("btnPlay").classList.remove("hidden");
+      }, 5000);
     }
 
     function proceedToSpin() {
