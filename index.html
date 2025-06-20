@@ -3,141 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <title>Roue de la Fortune</title>
- <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
-    font-family: Arial, sans-serif;
-    overflow-x: hidden;
-  }
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
 
-  .overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(4px);
-    z-index: 0;
-  }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+      z-index: 0;
+    }
 
-  .content {
-    position: relative;
-    z-index: 1;
-    color: white;
-    text-align: center;
-    padding: 30px 10px 0 10px;
-  }
+    .content {
+      position: relative;
+      z-index: 1;
+      color: white;
+      text-align: center;
+      padding-top: 30px;
+    }
 
-  .content img {
-    width: 100px;
-    max-width: 30vw;
-    height: auto;
-  }
+    .content img {
+      width: 100px;
+      max-width: 30vw;
+      height: auto;
+    }
 
-  canvas#wheel {
-    width: 90vw;
-    height: 90vw;
-    max-width: 500px;
-    max-height: 500px;
-  }
+    canvas#wheel {
+      width: 90vw;
+      height: 90vw;
+      max-width: 500px;
+      max-height: 500px;
+    }
 
-  #indicator {
-    position: absolute;
-    top: calc(60px + 5vw);
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 20px solid red;
-    z-index: 2;
-  }
+    #indicator {
+      position: absolute;
+      top: calc(60px + 5vw);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 20px solid red;
+      z-index: 2;
+    }
 
-  #popup {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-    padding: 20px;
-  }
+    #popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 20px;
+    }
 
-  #popupContent {
-    background: white;
-    color: black;
-    padding: 20px;
-    text-align: center;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 400px;
-    box-sizing: border-box;
-  }
+    #popupContent {
+      background: white;
+      color: black;
+      padding: 20px;
+      text-align: center;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+    }
 
-  #popupContent h2 {
-    font-size: 1.2em;
-  }
+    #popupContent input, #popupContent button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+    }
 
-  #popupContent input, #popupContent button {
-    margin-top: 10px;
-    width: 100%;
-    padding: 12px;
-    font-size: 1em;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  .confetti {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 1000;
-  }
-</style>
-
+    .confetti {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
 </head>
 <body>
   <div class="overlay"></div>
   <div class="content">
-    <img src="logo.png" alt="Logo" style="width: 120px;">
+    <img src="logo.png" alt="Logo">
     <h1>Jouer et tenter votre chance en nous laissant un avis Google</h1>
     <div id="indicator"></div>
     <canvas id="wheel" width="500" height="500"></canvas>
-    <button id="spinButton">Tourner la roue</button>
   </div>
 
+  <!-- Popup -->
   <div id="popup">
     <div id="popupContent">
-      <h2 id="resultText"></h2>
-      <div id="emailSection" style="display:none;">
-        <input type="email" id="emailInput" placeholder="Votre adresse email" required>
-        <button onclick="sendEmail()">Envoyer</button>
-      </div>
+      <h2 id="popupMessage">Laisse un avis Google et tu pourras tourner la roue !</h2>
+      <button id="popupBtn">Laisser un avis Google</button>
+      <input type="email" id="emailInput" placeholder="Votre adresse email" style="display: none;">
     </div>
   </div>
 
-  <script>
-    // 🎯 Modifier ici les segments (Gagné / Perdu)
-    const gains = ['Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉'];
+  <canvas id="confettiCanvas" class="confetti"></canvas>
 
+  <script>
+    // 🔧 MODIFIE CE LIEN PAR TON LIEN GOOGLE
+    const avisGoogleURL = "https://g.page/r/VOTRE-LIEN-D-AVIS-GOOGLE";
+
+    const gains = ['Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉'];
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
-    const spinButton = document.getElementById('spinButton');
-    const popup = document.getElementById('popup');
-    const resultText = document.getElementById('resultText');
-    const emailSection = document.getElementById('emailSection');
-    const emailInput = document.getElementById('emailInput');
-
-    const radius = 250;
     const center = canvas.width / 2;
+    const radius = center;
     const anglePerSegment = 2 * Math.PI / gains.length;
+
+    const popup = document.getElementById('popup');
+    const popupBtn = document.getElementById('popupBtn');
+    const popupMessage = document.getElementById('popupMessage');
+    const emailInput = document.getElementById('emailInput');
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const confettiCtx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+
     let currentAngle = 0;
+    let popupStep = 1;
 
     function drawWheel() {
       for (let i = 0; i < gains.length; i++) {
@@ -164,7 +163,7 @@
         ctx.rotate(angleStart + anglePerSegment / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "white";
-        ctx.font = "16px Arial";
+        ctx.font = "14px Arial";
         ctx.fillText(gains[i], radius - 10, 5);
         ctx.restore();
       }
@@ -175,13 +174,12 @@
       const duration = 4000;
       const start = performance.now();
 
-      spinButton.disabled = true;
-
       function animate(time) {
         const elapsed = time - start;
         const progress = Math.min(elapsed / duration, 1);
         const ease = 1 - Math.pow(1 - progress, 3);
         const angle = (spinAngle * ease) * Math.PI / 180;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
         ctx.translate(center, center);
@@ -204,34 +202,57 @@
     function showResult() {
       const index = Math.floor(((2 * Math.PI - currentAngle + anglePerSegment / 2) % (2 * Math.PI)) / anglePerSegment);
       const result = gains[index];
-      resultText.innerText = result;
       popup.style.display = 'flex';
 
       if (result.includes('Gagné')) {
-        emailSection.style.display = 'block';
+        popupMessage.innerText = "Bravo ! Tu as gagné 🎉";
+        popupBtn.innerText = "Envoyer mon gain";
+        emailInput.style.display = "block";
+        popupBtn.onclick = () => {
+          const email = emailInput.value.trim();
+          if (!email) return alert("Merci de renseigner votre e-mail.");
+          const subject = encodeURIComponent("🎉 [Nom du restaurant] – C’est gagné !");
+          const body = encodeURIComponent("Félicitations, vous avez gagné ! Votre gain est valable 2 mois.\n\n[NOM DU RESTAURANT]");
+          window.location.href = `mailto:restaurant@example.com?cc=${email}&subject=${subject}&body=${body}`;
+        };
+        launchConfetti();
       } else {
-        emailSection.style.display = 'none';
+        popupMessage.innerText = "Perdu 😢 Tu retenteras ta chance une prochaine fois.";
+        popupBtn.innerText = "Fermer";
+        popupBtn.onclick = () => popup.style.display = 'none';
       }
     }
 
-    function sendEmail() {
-      const email = emailInput.value.trim();
-      if (!email) {
-        alert('Merci de renseigner une adresse e-mail.');
-        return;
+    function launchConfetti() {
+      for (let i = 0; i < 100; i++) {
+        const x = Math.random() * confettiCanvas.width;
+        const y = Math.random() * confettiCanvas.height;
+        const size = Math.random() * 10 + 5;
+        const color = ['#f00', '#0f0', '#00f', '#ff0'][Math.floor(Math.random() * 4)];
+        confettiCtx.fillStyle = color;
+        confettiCtx.fillRect(x, y, size, size);
       }
-
-      const subject = encodeURIComponent("[Nom du restaurant] – C’est gagné !");
-      const body = encodeURIComponent("Félicitations, vous avez gagné ! Votre gain est valable 2 mois.\n\nCordialement,\n[Nom du restaurant]\nAdresse\nTéléphone\nEmail");
-
-      window.location.href = `mailto:restaurant@example.com?cc=${email}&subject=${subject}&body=${body}`;
     }
 
-    spinButton.addEventListener('click', spinWheel);
+    // Gestion des étapes du popup
+    popupBtn.onclick = () => {
+      if (popupStep === 1) {
+        window.open(avisGoogleURL, '_blank');
+        popupMessage.innerText = "Clique pour tenter ta chance !";
+        popupBtn.innerText = "Tourner la roue";
+        popupStep = 2;
+      } else if (popupStep === 2) {
+        popup.style.display = 'none';
+        popupStep = 3;
+        spinWheel();
+      }
+    };
+
     drawWheel();
   </script>
 </body>
 </html>
+
 
 
 
