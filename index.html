@@ -2,53 +2,132 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Roue de la Fortune</title>
+  <title>Roue de la Fortune Animée</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    #wheel { width: 300px; height: 300px; border: 10px solid #333; border-radius: 50%; margin: auto; }
-    #spinButton, #sendEmailBtn { padding: 10px 20px; margin: 20px; font-size: 18px; }
-    #emailField { margin-top: 20px; }
-    #result { font-size: 24px; margin-top: 20px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+    canvas {
+      margin: 20px auto;
+      display: block;
+    }
+    #spinButton, #sendEmailBtn {
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 20px;
+    }
+    #emailField {
+      display: none;
+      margin-top: 20px;
+    }
+    #result {
+      font-size: 24px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
   <h1>🎯 Roue de la Fortune</h1>
-  <div id="wheel">[Visuel de roue ici]</div>
+  <canvas id="wheel" width="400" height="400"></canvas>
   <button id="spinButton">🎡 Tourner la roue</button>
 
   <div id="result"></div>
 
-  <div id="emailField" style="display:none;">
-    <input type="email" id="userEmail" placeholder="Votre adresse e-mail" required>
+  <div id="emailField">
+    <input type="email" id="userEmail" placeholder="Votre adresse e-mail">
     <button id="sendEmailBtn">✉️ Envoyer l’e-mail</button>
   </div>
 
   <script>
+    const canvas = document.getElementById('wheel');
+    const ctx = canvas.getContext('2d');
     const spinButton = document.getElementById('spinButton');
     const resultDiv = document.getElementById('result');
     const emailField = document.getElementById('emailField');
     const sendEmailBtn = document.getElementById('sendEmailBtn');
 
-    const prizes = [
-      "Perdu", "Perdu", "Gagné", "Perdu", "Perdu", "Gagné", "Perdu", "Perdu"
-    ];
+    const segments = ["Perdu", "Gagné", "Perdu", "Perdu", "Gagné", "Perdu", "Perdu", "Perdu"];
+    const colors = ["#f44336", "#4CAF50", "#f44336", "#f44336", "#4CAF50", "#f44336", "#f44336", "#f44336"];
+    const segmentAngle = (2 * Math.PI) / segments.length;
+    let currentAngle = 0;
+    let isSpinning = false;
 
-    spinButton.addEventListener('click', () => {
-      // Simule la rotation et le choix aléatoire
-      const outcome = prizes[Math.floor(Math.random() * prizes.length)];
-
-      // Affiche le résultat
-      resultDiv.textContent = outcome === "Gagné" ? "🎉 Bravo, vous avez gagné !" : "😢 Perdu";
-
-      // Supprime le bouton tourner
-      spinButton.remove();
-
-      // Si gagné, montre le champ email
-      if (outcome === "Gagné") {
-        emailField.style.display = 'block';
+    function drawWheel() {
+      for (let i = 0; i < segments.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(200, 200);
+        ctx.fillStyle = colors[i];
+        ctx.arc(200, 200, 200, i * segmentAngle, (i + 1) * segmentAngle);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(200, 200);
+        ctx.rotate(i * segmentAngle + segmentAngle / 2);
+        ctx.fillStyle = "#fff";
+        ctx.font = "16px Arial";
+        ctx.textAlign = "right";
+        ctx.fillText(segments[i], 180, 10);
+        ctx.restore();
       }
-    });
+
+      // Draw pointer
+      ctx.beginPath();
+      ctx.moveTo(200, 0);
+      ctx.lineTo(190, 20);
+      ctx.lineTo(210, 20);
+      ctx.fillStyle = "#000";
+      ctx.fill();
+    }
+
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+      let rotation = Math.random() * 2000 + 2000; // total angle
+      let duration = 3000; // ms
+      let start = null;
+
+      function animate(timestamp) {
+        if (!start) start = timestamp;
+        let progress = timestamp - start;
+        let angle = easeOutCubic(progress, 0, rotation, duration);
+        currentAngle = angle;
+        ctx.clearRect(0, 0, 400, 400);
+        ctx.save();
+        ctx.translate(200, 200);
+        ctx.rotate(angle * Math.PI / 180);
+        ctx.translate(-200, -200);
+        drawWheel();
+        ctx.restore();
+
+        if (progress < duration) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          const landedIndex = segments.length - Math.floor(((angle % 360) / 360) * segments.length) - 1;
+          const result = segments[landedIndex];
+          resultDiv.textContent = result === "Gagné" ? "🎉 Bravo, vous avez gagné !" : "😢 Perdu";
+          spinButton.remove();
+          if (result === "Gagné") {
+            emailField.style.display = 'block';
+          }
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function easeOutCubic(t, b, c, d) {
+      t /= d;
+      t--;
+      return c * (t * t * t + 1) + b;
+    }
+
+    drawWheel();
+
+    spinButton.addEventListener('click', spinWheel);
 
     sendEmailBtn.addEventListener('click', () => {
       const userEmail = document.getElementById('userEmail').value;
@@ -57,14 +136,11 @@
         return;
       }
 
-      // Adresse du destinataire (ex : gérant)
       const recipient = "contact@entreprise.com";
-      const subject = encodeURIComponent("J'ai gagné à la roue !");
+      const subject = encodeURIComponent("🎉 J'ai gagné à la roue !");
       const body = encodeURIComponent("Bonjour,\n\nJe viens de gagner à la roue de la fortune !");
-      const mailtoLink = `mailto:${recipient}?cc=${userEmail}&subject=${subject}&body=${body}`;
-
-      // Ouvre le client mail
-      window.location.href = mailtoLink;
+      const mailto = `mailto:${recipient}?cc=${userEmail}&subject=${subject}&body=${body}`;
+      window.location.href = mailto;
     });
   </script>
 
