@@ -3,84 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <title>Roue de la Fortune</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-    }
+ <style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+  }
 
-    .overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(4px);
-      z-index: 0;
-    }
+  .overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    z-index: 0;
+  }
 
-    .content {
-      position: relative;
-      z-index: 1;
-      color: white;
-      text-align: center;
-      padding-top: 30px;
-    }
+  .content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-align: center;
+    padding: 30px 10px 0 10px;
+  }
 
-    canvas {
-      margin-top: 20px;
-    }
+  .content img {
+    width: 100px;
+    max-width: 30vw;
+    height: auto;
+  }
 
-    #spinButton {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 18px;
-      cursor: pointer;
-    }
+  canvas#wheel {
+    width: 90vw;
+    height: 90vw;
+    max-width: 500px;
+    max-height: 500px;
+  }
 
-    #indicator {
-      position: absolute;
-      top: 160px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 25px solid red;
-      z-index: 2;
-    }
+  #indicator {
+    position: absolute;
+    top: calc(60px + 5vw);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid red;
+    z-index: 2;
+  }
 
-    #popup {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
+  #popup {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    padding: 20px;
+  }
 
-    #popupContent {
-      background: white;
-      color: black;
-      padding: 30px;
-      text-align: center;
-      border-radius: 10px;
-      max-width: 400px;
-      width: 90%;
-    }
+  #popupContent {
+    background: white;
+    color: black;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+  }
 
-    #popupContent input, #popupContent button {
-      margin-top: 10px;
-      width: 100%;
-      padding: 10px;
-    }
-  </style>
+  #popupContent h2 {
+    font-size: 1.2em;
+  }
+
+  #popupContent input, #popupContent button {
+    margin-top: 10px;
+    width: 100%;
+    padding: 12px;
+    font-size: 1em;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .confetti {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+  }
+</style>
+
 </head>
 <body>
   <div class="overlay"></div>
