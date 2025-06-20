@@ -45,14 +45,14 @@
     }
     #indicator {
       position: absolute;
-      top: -30px;
+      top: 0px;
       left: 50%;
-      transform: translateX(-50%) rotate(180deg);
+      transform: translateX(-50%) rotate(0deg);
       width: 0;
       height: 0;
       border-left: 15px solid transparent;
       border-right: 15px solid transparent;
-      border-top: 20px solid red;
+      border-bottom: 20px solid red;
     }
     #spinBtn {
       position: absolute;
@@ -143,8 +143,9 @@
       "Un digestif offert",
       "Un sourire :-)"
     ];
-    const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
+    const gainFrequency = 5; // Modifier ici pour régler la fréquence des gains
 
+    const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"];
     const canvas = document.getElementById("wheelCanvas");
     const ctx = canvas.getContext("2d");
     const radius = canvas.width / 2;
@@ -261,10 +262,6 @@
       document.getElementById("popup").style.display = "block";
     }
   </script>
-</body>
-</html>
-
-
 </body>
 </html>
 
