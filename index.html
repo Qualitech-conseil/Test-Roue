@@ -234,7 +234,7 @@
       }
       const email = "cadeaux@restaurant.com";
       const subject = encodeURIComponent("Gain à la roue de la fortune");
-      const body = encodeURIComponent(`Bonjour,\n\nUn client a gagné : ${currentGain}\nEmail : ${emailValue}\nMerci de préparer le cadeau.`);
+      const body = encodeURIComponent(`Bonjour,\n\nCe client a gagné : ${currentGain}\nEmail : ${emailValue}\nvalable 2 mois à partir de la réception du mail.`);
       window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
     }
 
