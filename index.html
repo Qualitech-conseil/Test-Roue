@@ -46,7 +46,7 @@
 
     #indicator {
       position: absolute;
-      top: 160px;
+      top: 120px;
       left: 50%;
       transform: translateX(-50%) rotate(180deg);
       width: 0;
@@ -82,9 +82,12 @@
 
     #popupContent input, #popupContent button {
       margin-top: 10px;
-      width: 100%;
+      width: calc(100% - 24px);
       padding: 12px;
       font-size: 1em;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .confetti {
@@ -123,7 +126,6 @@
   <canvas id="confettiCanvas" class="confetti"></canvas>
 
   <script>
-    const avisGoogleURL = "https://g.page/r/VOTRE-LIEN-D-AVIS-GOOGLE";
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
     const center = canvas.width / 2;
@@ -143,144 +145,69 @@
     const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6'];
     const anglePerSegment = 2 * Math.PI / gains.length;
     let currentAngle = 0;
-    let popupStep = 1;
 
     const popup = document.getElementById('popup');
     const popupBtn = document.getElementById('popupBtn');
     const popupMessage = document.getElementById('popupMessage');
     const emailInput = document.getElementById('emailInput');
-    const confettiCanvas = document.getElementById('confettiCanvas');
-    const confettiCtx = confettiCanvas.getContext('2d');
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
+    const avisGoogleURL = "https://g.page/r/VOTRE-LIEN-D-AVIS-GOOGLE";
 
-    let confettiParticles = [];
+    let popupStep = 1;
 
-  function drawWheel() {
-  for (let i = 0; i < gains.length; i++) {
-    const startAngle = i * anglePerSegment;
-    const endAngle = startAngle + anglePerSegment;
-
-    // Fond coloré du segment
-    ctx.beginPath();
-    ctx.moveTo(center, center);
-    ctx.arc(center, center, radius, startAngle, endAngle);
-    ctx.fillStyle = colors[i % colors.length];
-    ctx.fill();
-    ctx.stroke();
-
-    // Traits de séparation
-    ctx.beginPath();
-    ctx.moveTo(center, center);
-    ctx.lineTo(center + radius * Math.cos(startAngle), center + radius * Math.sin(startAngle));
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Texte centré
-    ctx.save();
-    ctx.translate(center, center);
-    ctx.rotate(startAngle + anglePerSegment / 2);
-    ctx.textAlign = 'center';
-    ctx.fillStyle = 'white';
-    ctx.font = '16px Arial';
-    ctx.fillText(gains[i].label, radius * 0.65, 5);
-    ctx.restore();
-  }
-
-  // Points décoratifs sur le périmètre intérieur
-  const dotCount = 100;
-  for (let j = 0; j < dotCount; j++) {
-    const angle = (2 * Math.PI / dotCount) * j;
-    const dotRadius = radius - 10;
-    const x = center + dotRadius * Math.cos(angle);
-    const y = center + dotRadius * Math.sin(angle);
-    ctx.beginPath();
-    ctx.arc(x, y, 2, 0, 2 * Math.PI);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-  }
-}
-
-// Correction stable du calcul d'index dans showResult
-function showResult() {
-  const normalizedAngle = (currentAngle + 2 * Math.PI) % (2 * Math.PI);
-  const index = Math.floor((normalizedAngle) / anglePerSegment);
-  const result = gains[(gains.length - index) % gains.length];
-
-  popup.style.display = 'flex';
-  emailInput.style.display = result.win ? 'block' : 'none';
-
-  if (result.win) {
-    popupMessage.innerText = `Félicitations ! Vous avez gagné le lot : ${result.label}`;
-    popupBtn.innerText = "Envoyer";
     popupBtn.onclick = () => {
-      const email = emailInput.value.trim();
-      if (!email) return alert("Merci de renseigner votre adresse e-mail.");
-      const subject = encodeURIComponent(`[Nom du restaurant] – Vous avez gagné : ${result.label}`);
-      const body = encodeURIComponent(`Félicitations ! Vous avez remporté le lot : ${result.label}. Votre gain est valable 2 mois.`);
-      window.location.href = `mailto:restaurant@example.com?cc=${email}&subject=${subject}&body=${body}`;
+      if (popupStep === 1) {
+        window.open(avisGoogleURL, '_blank');
+        popupMessage.innerText = "Vous pouvez maintenant tenter votre chance.";
+        popupBtn.innerText = "Tourner la roue";
+        popupStep = 2;
+      } else if (popupStep === 2) {
+        popup.style.display = 'none';
+        popupStep = 3;
+        spinWheel();
+      }
     };
-    launchConfetti();
-  } else {
-    popupMessage.innerText = "Désolé, vous avez perdu cette fois-ci.";
-    popupBtn.innerText = "Fermer";
-    popupBtn.onclick = () => popup.style.display = 'none';
-  }
-}
 
-// Ajout de style CSS pour adapter le champ e-mail
-const style = document.createElement('style');
-style.innerHTML = `
-  #emailInput {
-    width: calc(100% - 24px);
-    box-sizing: border-box;
-  }
-  #popupContent button {
-    width: calc(100% - 24px);
-  }
-`;
-document.head.appendChild(style);
+    function drawWheel() {
+      for (let i = 0; i < gains.length; i++) {
+        const startAngle = i * anglePerSegment;
+        const endAngle = startAngle + anglePerSegment;
 
-// Correction finale du calcul d'index dans showResult
-function showResult() {
-  const adjustedAngle = (2 * Math.PI - currentAngle + anglePerSegment / 2) % (2 * Math.PI);
-  const index = Math.floor(adjustedAngle / anglePerSegment);
-  const result = gains[index];
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, startAngle, endAngle);
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+        ctx.stroke();
 
-  popup.style.display = 'flex';
-  emailInput.style.display = result.win ? 'block' : 'none';
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.lineTo(center + radius * Math.cos(startAngle), center + radius * Math.sin(startAngle));
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-  if (result.win) {
-    popupMessage.innerText = `Félicitations ! Vous avez gagné le lot : ${result.label}`;
-    popupBtn.innerText = "Envoyer";
-    popupBtn.onclick = () => {
-      const email = emailInput.value.trim();
-      if (!email) return alert("Merci de renseigner votre adresse e-mail.");
-      const subject = encodeURIComponent(`[Nom du restaurant] – Vous avez gagné : ${result.label}`);
-      const body = encodeURIComponent(`Félicitations ! Vous avez remporté le lot : ${result.label}. Votre gain est valable 2 mois.`);
-      window.location.href = `mailto:restaurant@example.com?cc=${email}&subject=${subject}&body=${body}`;
-    };
-    launchConfetti();
-  } else {
-    popupMessage.innerText = "Désolé, vous avez perdu cette fois-ci.";
-    popupBtn.innerText = "Fermer";
-    popupBtn.onclick = () => popup.style.display = 'none';
-  }
-}
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(startAngle + anglePerSegment / 2);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'white';
+        ctx.font = '16px Arial';
+        ctx.fillText(gains[i].label, radius * 0.65, 5);
+        ctx.restore();
+      }
 
-// Ajout de style CSS pour adapter le champ e-mail
-const style = document.createElement('style');
-style.innerHTML = `
-  #emailInput {
-    width: calc(100% - 24px);
-    box-sizing: border-box;
-  }
-  #popupContent button {
-    width: calc(100% - 24px);
-  }
-`;
-document.head.appendChild(style);
+      const dotCount = 100;
+      for (let j = 0; j < dotCount; j++) {
+        const angle = (2 * Math.PI / dotCount) * j;
+        const dotRadius = radius - 10;
+        const x = center + dotRadius * Math.cos(angle);
+        const y = center + dotRadius * Math.sin(angle);
+        ctx.beginPath();
+        ctx.arc(x, y, 2, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+      }
+    }
 
     function spinWheel() {
       const spinAngle = Math.random() * 360 + 1440;
@@ -312,43 +239,38 @@ document.head.appendChild(style);
       requestAnimationFrame(animate);
     }
 
-  function showResult() {
-  const index = Math.floor(((currentAngle + anglePerSegment / 2) % (2 * Math.PI)) / anglePerSegment);
-  const result = gains[index];
+    function showResult() {
+      const normalizedAngle = (currentAngle + 2 * Math.PI) % (2 * Math.PI);
+      const index = Math.floor((normalizedAngle) / anglePerSegment);
+      const result = gains[(gains.length - index) % gains.length];
 
-  popup.style.display = 'flex';
-  emailInput.style.display = result.win ? 'block' : 'none';
+      popup.style.display = 'flex';
+      emailInput.style.display = result.win ? 'block' : 'none';
 
-  if (result.win) {
-    popupMessage.innerText = `Félicitations ! Vous avez gagné le lot : ${result.label}`;
-    popupBtn.innerText = "Envoyer";
-    popupBtn.onclick = () => {
-      const email = emailInput.value.trim();
-      if (!email) return alert("Merci de renseigner votre adresse e-mail.");
-      const subject = encodeURIComponent(`[Nom du restaurant] – Vous avez gagné : ${result.label}`);
-      const body = encodeURIComponent(`Félicitations ! Vous avez remporté le lot : ${result.label}. Votre gain est valable 2 mois.`);
-      window.location.href = `mailto:restaurant@example.com?cc=${email}&subject=${subject}&body=${body}`;
-    };
-    launchConfetti();
-  } else {
-    popupMessage.innerText = "Désolé, vous avez perdu cette fois-ci.";
-    popupBtn.innerText = "Fermer";
-    popupBtn.onclick = () => popup.style.display = 'none';
-  }
-}
+      if (result.win) {
+        popupMessage.innerText = `Félicitations ! Vous avez gagné le lot : ${result.label}`;
+        popupBtn.innerText = "Envoyer";
+        popupBtn.onclick = () => {
+          const email = emailInput.value.trim();
+          if (!email) return alert("Merci de renseigner votre adresse e-mail.");
+          const subject = encodeURIComponent(`[Nom du restaurant] – Vous avez gagné : ${result.label}`);
+          const body = encodeURIComponent(`Félicitations ! Vous avez remporté le lot : ${result.label}. Votre gain est valable 2 mois.`);
+          window.location.href = `mailto:restaurant@example.com?cc=${email}&subject=${subject}&body=${body}`;
+        };
+        launchConfetti();
+      } else {
+        popupMessage.innerText = "Désolé, vous avez perdu cette fois-ci.";
+        popupBtn.innerText = "Fermer";
+        popupBtn.onclick = () => popup.style.display = 'none';
+      }
+    }
 
-// Ajout de style CSS pour adapter le champ e-mail
-const style = document.createElement('style');
-style.innerHTML = `
-  #emailInput {
-    width: calc(100% - 24px);
-    box-sizing: border-box;
-  }
-  #popupContent button {
-    width: calc(100% - 24px);
-  }
-`;
-document.head.appendChild(style);
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const confettiCtx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    let confettiParticles = [];
+
     function launchConfetti() {
       confettiParticles = [];
       for (let i = 0; i < 150; i++) {
@@ -376,19 +298,6 @@ document.head.appendChild(style);
       });
       requestAnimationFrame(drawConfetti);
     }
-
-    popupBtn.onclick = () => {
-      if (popupStep === 1) {
-        window.open(avisGoogleURL, '_blank');
-        popupMessage.innerText = "Vous pouvez maintenant tenter votre chance.";
-        popupBtn.innerText = "Tourner la roue";
-        popupStep = 2;
-      } else if (popupStep === 2) {
-        popup.style.display = 'none';
-        popupStep = 3;
-        spinWheel();
-      }
-    };
 
     drawWheel();
   </script>
