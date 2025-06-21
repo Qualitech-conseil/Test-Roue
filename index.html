@@ -46,32 +46,27 @@
 
     #indicator {
       position: absolute;
-      top: calc(50% - 230px);
+      top: calc(50% - 260px);
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) rotate(0deg);
       width: 20px;
       height: 40px;
-      background: transparent;
       z-index: 2;
     }
 
     #indicator::after {
       content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%) rotate(0deg);
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-bottom: 20px solid red;
-      animation: flexTap 0.3s ease infinite alternate;
+      display: block;
+      width: 20px;
+      height: 40px;
+      background: red;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      animation: tapFlex 0.2s ease-in-out infinite alternate;
     }
 
-    @keyframes flexTap {
-      0% { transform: translateX(-50%) rotate(0deg); }
-      100% { transform: translateX(-50%) rotate(5deg); }
+    @keyframes tapFlex {
+      from { transform: rotate(-10deg); }
+      to { transform: rotate(10deg); }
     }
 
     #popup {
@@ -160,7 +155,7 @@
 
     const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0'];
     const anglePerSegment = 2 * Math.PI / gains.length;
-    let currentRotation = 0;
+    let currentAngle = 0;
 
     const popup = document.getElementById('popup');
     const popupBtn = document.getElementById('popupBtn');
@@ -204,36 +199,23 @@
         ctx.fillText(gains[i].label, radius * 0.65, 5);
         ctx.restore();
       }
-
-      const dotCount = 100;
-      for (let j = 0; j < dotCount; j++) {
-        const angle = (2 * Math.PI / dotCount) * j;
-        const dotRadius = radius - 10;
-        const x = center + dotRadius * Math.cos(angle);
-        const y = center + dotRadius * Math.sin(angle);
-        ctx.beginPath();
-        ctx.arc(x, y, 2, 0, 2 * Math.PI);
-        ctx.fillStyle = 'white';
-        ctx.fill();
-      }
     }
 
     function spinWheel() {
-      const spins = 5 + Math.random() * 2;
-      const finalRotation = currentRotation + spins * 2 * Math.PI;
+      const spinAngle = Math.random() * 360 + 1440;
       const duration = 4000;
       const start = performance.now();
 
       function animate(time) {
         const elapsed = time - start;
         const progress = Math.min(elapsed / duration, 1);
-        const easing = 1 - Math.pow(1 - progress, 3);
-        currentRotation = finalRotation * easing;
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const angle = (spinAngle * ease) * Math.PI / 180;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
         ctx.translate(center, center);
-        ctx.rotate(currentRotation);
+        ctx.rotate(angle);
         ctx.translate(-center, -center);
         drawWheel();
         ctx.restore();
@@ -241,6 +223,7 @@
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
+          currentAngle = angle % (2 * Math.PI);
           showResult();
         }
       }
@@ -249,7 +232,7 @@
     }
 
     function showResult() {
-      const normalizedAngle = (2 * Math.PI - (currentRotation % (2 * Math.PI))) % (2 * Math.PI);
+      const normalizedAngle = (2 * Math.PI - (currentAngle % (2 * Math.PI))) % (2 * Math.PI);
       const index = Math.floor((normalizedAngle / anglePerSegment)) % gains.length;
       const result = gains[index];
 
@@ -312,6 +295,7 @@
   </script>
 </body>
 </html>
+
 
 
 
