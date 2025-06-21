@@ -46,7 +46,7 @@
 
     #indicator {
       position: absolute;
-      top: calc(50% - 260px);
+      top: calc(50% - 250px);
       left: 50%;
       transform: translateX(-50%) rotate(0deg);
       width: 20px;
@@ -60,7 +60,7 @@
       width: 20px;
       height: 40px;
       background: red;
-      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      border-radius: 60% 60% 40% 40% / 80% 80% 20% 20%;
       animation: tapFlex 0.2s ease-in-out infinite alternate;
     }
 
@@ -232,7 +232,7 @@
     }
 
     function showResult() {
-      const normalizedAngle = (2 * Math.PI - (currentAngle % (2 * Math.PI))) % (2 * Math.PI);
+      const normalizedAngle = (2 * Math.PI - (currentAngle + anglePerSegment / 2)) % (2 * Math.PI);
       const index = Math.floor((normalizedAngle / anglePerSegment)) % gains.length;
       const result = gains[index];
 
