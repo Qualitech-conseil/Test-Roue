@@ -160,7 +160,7 @@
 
     const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0'];
     const anglePerSegment = 2 * Math.PI / gains.length;
-    let currentAngle = 0;
+    let currentRotation = 0;
 
     const popup = document.getElementById('popup');
     const popupBtn = document.getElementById('popupBtn');
@@ -195,13 +195,6 @@
         ctx.fill();
         ctx.stroke();
 
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.lineTo(center + radius * Math.cos(startAngle), center + radius * Math.sin(startAngle));
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
         ctx.save();
         ctx.translate(center, center);
         ctx.rotate(startAngle + anglePerSegment / 2);
@@ -226,20 +219,21 @@
     }
 
     function spinWheel() {
-      const spinAngle = Math.random() * 360 + 1440;
+      const spins = 5 + Math.random() * 2;
+      const finalRotation = currentRotation + spins * 2 * Math.PI;
       const duration = 4000;
       const start = performance.now();
 
       function animate(time) {
         const elapsed = time - start;
         const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const angle = (spinAngle * ease) * Math.PI / 180;
+        const easing = 1 - Math.pow(1 - progress, 3);
+        currentRotation = finalRotation * easing;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
         ctx.translate(center, center);
-        ctx.rotate(angle);
+        ctx.rotate(currentRotation);
         ctx.translate(-center, -center);
         drawWheel();
         ctx.restore();
@@ -247,7 +241,6 @@
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
-          currentAngle = angle % (2 * Math.PI);
           showResult();
         }
       }
@@ -256,8 +249,8 @@
     }
 
     function showResult() {
-      const normalizedAngle = (currentAngle + 2 * Math.PI) % (2 * Math.PI);
-      const index = Math.floor((gains.length - (normalizedAngle / anglePerSegment)) % gains.length);
+      const normalizedAngle = (2 * Math.PI - (currentRotation % (2 * Math.PI))) % (2 * Math.PI);
+      const index = Math.floor((normalizedAngle / anglePerSegment)) % gains.length;
       const result = gains[index];
 
       popup.style.display = 'flex';
