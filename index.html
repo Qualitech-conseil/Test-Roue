@@ -240,9 +240,9 @@
     }
 
     function showResult() {
-      const normalizedAngle = (currentAngle + 2 * Math.PI) % (2 * Math.PI);
-      const index = Math.floor((normalizedAngle) / anglePerSegment);
-      const result = gains[(gains.length - index) % gains.length];
+      const normalizedAngle = (currentAngle + anglePerSegment / 2 + 2 * Math.PI) % (2 * Math.PI);
+      const index = Math.floor((gains.length - (normalizedAngle / anglePerSegment)) % gains.length);
+      const result = gains[index];
 
       popup.style.display = 'flex';
       emailInput.style.display = result.win ? 'block' : 'none';
