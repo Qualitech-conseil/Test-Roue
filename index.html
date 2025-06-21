@@ -2,15 +2,16 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roue de la Fortune</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      background: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
       font-family: Arial, sans-serif;
-      overflow: hidden;
+      background: url('https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
+      overflow-x: hidden;
     }
 
     .overlay {
@@ -27,7 +28,7 @@
       z-index: 1;
       color: white;
       text-align: center;
-      padding-top: 30px;
+      padding: 20px;
     }
 
     .content img {
@@ -45,14 +46,14 @@
 
     #indicator {
       position: absolute;
-      top: calc(60px + 5vw);
+      top: 120px;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) rotate(180deg);
       width: 0;
       height: 0;
       border-left: 10px solid transparent;
       border-right: 10px solid transparent;
-      border-bottom: 20px solid red;
+      border-top: 20px solid red;
       z-index: 2;
     }
 
@@ -93,38 +94,55 @@
       pointer-events: none;
       z-index: 1000;
     }
+
+    #lot3count {
+      color: white;
+      font-weight: bold;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
   <div class="overlay"></div>
   <div class="content">
     <img src="logo.png" alt="Logo">
-    <h1>Jouer et tenter votre chance en nous laissant un avis Google</h1>
+    <h1>Jouez et tentez votre chance en nous laissant un avis Google</h1>
     <div id="indicator"></div>
     <canvas id="wheel" width="500" height="500"></canvas>
+    <div id="lot3count">Le lot 3 (le plus important) n'a été gagné qu'une seule fois ce mois-ci (juin).</div>
   </div>
 
-  <!-- Popup -->
   <div id="popup">
     <div id="popupContent">
-      <h2 id="popupMessage">Laisse un avis Google et tu pourras tourner la roue !</h2>
+      <h2 id="popupMessage">Veuillez laisser un avis Google pour pouvoir jouer.</h2>
+      <input type="email" id="emailInput" placeholder="Votre adresse e-mail" style="display:none;">
       <button id="popupBtn">Laisser un avis Google</button>
-      <input type="email" id="emailInput" placeholder="Votre adresse email" style="display: none;">
     </div>
   </div>
 
   <canvas id="confettiCanvas" class="confetti"></canvas>
 
   <script>
-    // 🔧 MODIFIE CE LIEN PAR TON LIEN GOOGLE
     const avisGoogleURL = "https://g.page/r/VOTRE-LIEN-D-AVIS-GOOGLE";
-
-    const gains = ['Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉', 'Perdu 😢', 'Gagné 🎉'];
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
     const center = canvas.width / 2;
     const radius = center;
+
+    const gains = [
+      { label: 'Perdu', win: false },
+      { label: 'Lot 1', win: true, frequency: 10 },
+      { label: 'Perdu', win: false },
+      { label: 'Lot 2', win: true, frequency: 15 },
+      { label: 'Perdu', win: false },
+      { label: 'Lot 3', win: true, frequency: 50 },
+      { label: 'Perdu', win: false },
+      { label: 'Lot 1', win: true, frequency: 10 }
+    ];
+
     const anglePerSegment = 2 * Math.PI / gains.length;
+    let currentAngle = 0;
+    let popupStep = 1;
 
     const popup = document.getElementById('popup');
     const popupBtn = document.getElementById('popupBtn');
@@ -135,36 +153,31 @@
     confettiCanvas.width = window.innerWidth;
     confettiCanvas.height = window.innerHeight;
 
-    let currentAngle = 0;
-    let popupStep = 1;
-
     function drawWheel() {
       for (let i = 0; i < gains.length; i++) {
-        const angleStart = i * anglePerSegment;
-        const angleEnd = angleStart + anglePerSegment;
+        const startAngle = i * anglePerSegment;
+        const endAngle = startAngle + anglePerSegment;
 
         ctx.beginPath();
         ctx.moveTo(center, center);
-        ctx.arc(center, center, radius, angleStart, angleEnd);
+        ctx.arc(center, center, radius, startAngle, endAngle);
         ctx.fillStyle = i % 2 === 0 ? '#f4c542' : '#f4511e';
         ctx.fill();
         ctx.stroke();
 
-        // Barres internes
         ctx.beginPath();
         ctx.moveTo(center, center);
-        ctx.lineTo(center + radius * Math.cos(angleStart), center + radius * Math.sin(angleStart));
+        ctx.lineTo(center + radius * Math.cos(startAngle), center + radius * Math.sin(startAngle));
         ctx.strokeStyle = 'white';
         ctx.stroke();
 
-        // Texte
         ctx.save();
         ctx.translate(center, center);
-        ctx.rotate(angleStart + anglePerSegment / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "white";
-        ctx.font = "14px Arial";
-        ctx.fillText(gains[i], radius - 10, 5);
+        ctx.rotate(startAngle + anglePerSegment / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Arial';
+        ctx.fillText(gains[i].label, radius - 10, 5);
         ctx.restore();
       }
     }
@@ -202,29 +215,31 @@
     function showResult() {
       const index = Math.floor(((2 * Math.PI - currentAngle + anglePerSegment / 2) % (2 * Math.PI)) / anglePerSegment);
       const result = gains[index];
-      popup.style.display = 'flex';
 
-      if (result.includes('Gagné')) {
-        popupMessage.innerText = "Bravo ! Tu as gagné 🎉";
-        popupBtn.innerText = "Envoyer mon gain";
-        emailInput.style.display = "block";
+      popup.style.display = 'flex';
+      emailInput.style.display = result.win ? 'block' : 'none';
+
+      if (result.win) {
+        popupMessage.innerText = `Félicitations ! Vous avez gagné le lot : ${result.label}`;
+        popupBtn.innerText = "Envoyer";
         popupBtn.onclick = () => {
           const email = emailInput.value.trim();
-          if (!email) return alert("Merci de renseigner votre e-mail.");
-          const subject = encodeURIComponent("🎉 [Nom du restaurant] – C’est gagné !");
-          const body = encodeURIComponent("Félicitations, vous avez gagné ! Votre gain est valable 2 mois.\n\n[NOM DU RESTAURANT]");
+          if (!email) return alert("Merci de renseigner votre adresse e-mail.");
+          const subject = encodeURIComponent(`[Nom du restaurant] – Vous avez gagné : ${result.label}`);
+          const body = encodeURIComponent(`Félicitations ! Vous avez remporté le lot : ${result.label}. Votre gain est valable 2 mois.`);
           window.location.href = `mailto:restaurant@example.com?cc=${email}&subject=${subject}&body=${body}`;
         };
         launchConfetti();
       } else {
-        popupMessage.innerText = "Perdu 😢 Tu retenteras ta chance une prochaine fois.";
+        popupMessage.innerText = "Désolé, vous avez perdu cette fois-ci.";
         popupBtn.innerText = "Fermer";
         popupBtn.onclick = () => popup.style.display = 'none';
       }
     }
 
     function launchConfetti() {
-      for (let i = 0; i < 100; i++) {
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      for (let i = 0; i < 150; i++) {
         const x = Math.random() * confettiCanvas.width;
         const y = Math.random() * confettiCanvas.height;
         const size = Math.random() * 10 + 5;
@@ -234,11 +249,10 @@
       }
     }
 
-    // Gestion des étapes du popup
     popupBtn.onclick = () => {
       if (popupStep === 1) {
         window.open(avisGoogleURL, '_blank');
-        popupMessage.innerText = "Clique pour tenter ta chance !";
+        popupMessage.innerText = "Vous pouvez maintenant tenter votre chance.";
         popupBtn.innerText = "Tourner la roue";
         popupStep = 2;
       } else if (popupStep === 2) {
