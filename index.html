@@ -130,16 +130,17 @@
     const radius = center;
 
     const gains = [
-      { label: 'Perdu', win: false },
-      { label: 'Lot 1', win: true, frequency: 10 },
-      { label: 'Perdu', win: false },
-      { label: 'Lot 2', win: true, frequency: 15 },
-      { label: 'Perdu', win: false },
-      { label: 'Lot 3', win: true, frequency: 50 },
-      { label: 'Perdu', win: false },
-      { label: 'Lot 1', win: true, frequency: 10 }
+      { label: '😢 Perdu', win: false },
+      { label: '🎁 Lot 1', win: true, frequency: 10 },
+      { label: '😢 Perdu', win: false },
+      { label: '🎉 Lot 2', win: true, frequency: 15 },
+      { label: '😢 Perdu', win: false },
+      { label: '🏆 Lot 3', win: true, frequency: 50 },
+      { label: '😢 Perdu', win: false },
+      { label: '🎁 Lot 1', win: true, frequency: 10 }
     ];
 
+    const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6'];
     const anglePerSegment = 2 * Math.PI / gains.length;
     let currentAngle = 0;
     let popupStep = 1;
@@ -153,6 +154,8 @@
     confettiCanvas.width = window.innerWidth;
     confettiCanvas.height = window.innerHeight;
 
+    let confettiParticles = [];
+
     function drawWheel() {
       for (let i = 0; i < gains.length; i++) {
         const startAngle = i * anglePerSegment;
@@ -161,7 +164,7 @@
         ctx.beginPath();
         ctx.moveTo(center, center);
         ctx.arc(center, center, radius, startAngle, endAngle);
-        ctx.fillStyle = i % 2 === 0 ? '#f4c542' : '#f4511e';
+        ctx.fillStyle = colors[i % colors.length];
         ctx.fill();
         ctx.stroke();
 
@@ -169,6 +172,7 @@
         ctx.moveTo(center, center);
         ctx.lineTo(center + radius * Math.cos(startAngle), center + radius * Math.sin(startAngle));
         ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
         ctx.stroke();
 
         ctx.save();
@@ -238,15 +242,31 @@
     }
 
     function launchConfetti() {
-      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettiParticles = [];
       for (let i = 0; i < 150; i++) {
-        const x = Math.random() * confettiCanvas.width;
-        const y = Math.random() * confettiCanvas.height;
-        const size = Math.random() * 10 + 5;
-        const color = ['#f00', '#0f0', '#00f', '#ff0'][Math.floor(Math.random() * 4)];
-        confettiCtx.fillStyle = color;
-        confettiCtx.fillRect(x, y, size, size);
+        confettiParticles.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * -confettiCanvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 10 + 4,
+          color: ['#f00','#0f0','#00f','#ff0'][Math.floor(Math.random()*4)],
+          tilt: Math.random() * 10 - 5
+        });
       }
+      requestAnimationFrame(drawConfetti);
+    }
+
+    function drawConfetti() {
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettiParticles.forEach(p => {
+        confettiCtx.beginPath();
+        confettiCtx.fillStyle = p.color;
+        confettiCtx.ellipse(p.x, p.y, p.r, p.r / 2, p.tilt, 0, 2 * Math.PI);
+        confettiCtx.fill();
+        p.y += p.d / 2;
+        p.tilt += 0.1;
+      });
+      requestAnimationFrame(drawConfetti);
     }
 
     popupBtn.onclick = () => {
@@ -266,6 +286,7 @@
   </script>
 </body>
 </html>
+
 
 
 
