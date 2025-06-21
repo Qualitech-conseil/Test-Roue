@@ -157,34 +157,50 @@
     let confettiParticles = [];
 
     function drawWheel() {
-      for (let i = 0; i < gains.length; i++) {
-        const startAngle = i * anglePerSegment;
-        const endAngle = startAngle + anglePerSegment;
+  for (let i = 0; i < gains.length; i++) {
+    const startAngle = i * anglePerSegment;
+    const endAngle = startAngle + anglePerSegment;
 
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.arc(center, center, radius, startAngle, endAngle);
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.fill();
-        ctx.stroke();
+    // Fond coloré du segment
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, radius, startAngle, endAngle);
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.fill();
+    ctx.stroke();
 
-        ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.lineTo(center + radius * Math.cos(startAngle), center + radius * Math.sin(startAngle));
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+    // Traits de séparation
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.lineTo(center + radius * Math.cos(startAngle), center + radius * Math.sin(startAngle));
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(startAngle + anglePerSegment / 2);
-        ctx.textAlign = 'right';
-        ctx.fillStyle = 'white';
-        ctx.font = '14px Arial';
-        ctx.fillText(gains[i].label, radius - 10, 5);
-        ctx.restore();
-      }
-    }
+    // Texte
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(startAngle + anglePerSegment / 2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'white';
+    ctx.font = '14px Arial';
+    ctx.fillText(gains[i].label, radius - 10, 5);
+    ctx.restore();
+  }
+
+  // Points décoratifs sur le périmètre intérieur
+  const dotCount = 100;
+  for (let j = 0; j < dotCount; j++) {
+    const angle = (2 * Math.PI / dotCount) * j;
+    const dotRadius = radius - 10;
+    const x = center + dotRadius * Math.cos(angle);
+    const y = center + dotRadius * Math.sin(angle);
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, 2 * Math.PI);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+  }
+}
 
     function spinWheel() {
       const spinAngle = Math.random() * 360 + 1440;
