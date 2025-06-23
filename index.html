@@ -44,25 +44,16 @@
     }
     #indicator {
       position: absolute;
-      top: calc(50% - 280px); /* ajustable si besoin */
+      top: calc(50% - 250px); /* Ajusté pour être en haut de la roue */
       left: 50%;
-      transform: translateX(-50%) rotate(180deg) ;
-      width: 24px; height: 48px;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 40px;
+      background: red;
+      border-radius: 3px;
       z-index: 5;
       pointer-events: none;
-    }
-    #indicator::after {
-      content: ''; display: block;
-      width: 24px; height: 48px;
-      background: red;
-      border-radius: 50% 50% 60% 40% / 40% 60% 50% 50%;
-      transform-origin: center bottom;
-      animation: sway 0.4s ease-in-out infinite alternate;
-      box-shadow: 0 0 5px rgba(255,0,0,0.7);
-    }
-    @keyframes sway {
-      from { transform: rotate(-10deg); }
-      to { transform: rotate(10deg); }
+      box-shadow: 0 0 8px rgba(255,0,0,0.8);
     }
     #popup {
       position: fixed; top: 0; left: 0;
@@ -97,7 +88,7 @@
   <div class="content">
     <img src="logo.png" alt="Logo" />
     <h1>Jouez et tentez votre chance en nous laissant un avis Google</h1>
-    <div id="lot3count">Le repas gratuit a été gagné une seule fois ce mois - il est peut être pour vous !!!</div>
+    <div id="lot3count">Le lot 3 (le plus important) n'a été gagné qu'une seule fois ce mois-ci (juin).</div>
     <canvas id="wheel" width="500" height="500"></canvas>
     <div id="indicator"></div>
   </div>
@@ -115,201 +106,197 @@
   <script>
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
-    const center = canvas.width/2, radius = center;
-    
-// Limites mensuelles de gain pour chaque lot (modifiable)
-const maxLot1 = 3;  // Lot 1 autorisé 3 fois par mois
-const maxLot2 = 2;  // Lot 2 autorisé 2 fois par mois
-const maxLot3 = 1;  // Lot 3 autorisé 1 fois par mois
-
-let lot1Count = 0;
-let lot2Count = 0;
-let lot3Count = 0;
-    
-    const gains = [
-  {label:'😢 Perdu',win:false},
-  {label:'🎁 Lot 1',win:true, type:1},
-  {label:'😢 Perdu',win:false},
-  {label:'🎉 Lot 2',win:true, type:2},
-  {label:'😢 Perdu',win:false},
-  {label:'🏆 Lot 3',win:true, type:3},
- 
-];
-
-    const colors = ['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4'];
-    const anglePerSeg = 2*Math.PI/gains.length;
-
-    // Positioner languette
+    const center = canvas.width / 2, radius = center;
     const indicator = document.getElementById('indicator');
-    function posInd() {
-      const rect = canvas.getBoundingClientRect();
-      indicator.style.top = `${rect.top + window.scrollY}px`;
-      indicator.style.left = `${rect.left + window.scrollX + rect.width/2 - 12}px`;
-    }
-    window.addEventListener('load',posInd);
-    window.addEventListener('resize',posInd);
 
-    let currentAngle=0, isSpinning=false, popupStep=1;
+    // Segments : alternance Lot/perdu dans l'ordre
+    const gains = [
+      {label:'🎁 Lot 1', win:true, type:1},
+      {label:'😢 Perdu', win:false},
+      {label:'🎉 Lot 2', win:true, type:2},
+      {label:'😢 Perdu', win:false},
+      {label:'🏆 Lot 3', win:true, type:3},
+      {label:'😢 Perdu', win:false}
+    ];
 
-    const popup = document.getElementById('popup'),
-          popupBtn = document.getElementById('popupBtn'),
-          popupMsg = document.getElementById('popupMessage'),
-          email = document.getElementById('emailInput'),
-          avisURL = "https://www.google.com/search?client=firefox-b-d&sca_esv=ac60e713747e51d1&q=domaine+sol+payr%C3%A9&si=AMgyJEuzsz2NflaaWzrzdpjxXXRaJ2hfdMsbe_mSWso6src8s_V2dAn1SgYwA0t4-2e3O78LiO1M9TvZ0GrFHwJ_rMTtDhaQ4Ivo2YUe_06m8eyz3NNxd0w%3D&uds=AOm0WdGidOdjVhBHIqi6IfHFtxCD-pFhDw12wehonGwc8hQQwj2fv8AgrhQm0jyg8xDOojLspLjfdtGGBkbn7kEKv98O_lGI_QDawxLRqq68h0VlRhHMfq0&sa=X&ved=2ahUKEwj5uq2MroiOAxVHRKQEHRhSHzgQ3PALegQIHRAE&biw=1536&bih=777&dpr=1.25";
+    const colors = ['#3cb44b', '#e6194b', '#4363d8', '#e6194b', '#911eb4', '#e6194b'];
+    const anglePerSeg = 2 * Math.PI / gains.length;
+
+    let currentAngle = 0;
+    let isSpinning = false;
+    let popupStep = 1;
+
+    const popup = document.getElementById('popup');
+    const popupBtn = document.getElementById('popupBtn');
+    const popupMsg = document.getElementById('popupMessage');
+    const email = document.getElementById('emailInput');
+    const avisURL = "https://g.page/r/VOTRE-LIEN-D-AVIS-GOOGLE";
+
+    // Limites mensuelles par lot
+    const maxLot1 = 3, maxLot2 = 2, maxLot3 = 1;
+    let lot1Count = 0, lot2Count = 0, lot3Count = 0;
 
     popupBtn.onclick = () => {
-      if(popupStep===1){
-        window.open(avisURL,'_blank');
-        popupMsg.innerText="Vous pouvez maintenant tenter votre chance.";
-        popupBtn.innerText="Tourner la roue";
-        popupStep=2;
-      } else if(popupStep===2 && !isSpinning){
-        popup.style.display='none';
+      if (popupStep === 1) {
+        window.open(avisURL, '_blank');
+        popupMsg.innerText = "Vous pouvez maintenant tenter votre chance.";
+        popupBtn.innerText = "Tourner la roue";
+        popupStep = 2;
+      } else if (popupStep === 2 && !isSpinning) {
+        popup.style.display = 'none';
         spin();
       }
     };
 
-    function drawWheel(rot=0){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
+    function drawWheel(angle = 0) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
-      ctx.translate(center,center);
-      ctx.rotate(rot);
-      ctx.translate(-center,-center);
-      for(let i=0;i<gains.length;i++){
-        let sa=i*anglePerSeg, ea=sa+anglePerSeg;
+      ctx.translate(center, center);
+      ctx.rotate(angle);
+      ctx.translate(-center, -center);
+
+      for (let i = 0; i < gains.length; i++) {
+        const start = i * anglePerSeg;
+        const end = start + anglePerSeg;
+
         ctx.beginPath();
-        ctx.moveTo(center,center);
-        ctx.arc(center,center,radius,sa,ea);
-        ctx.fillStyle=colors[i];
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, start, end);
+        ctx.fillStyle = colors[i];
         ctx.fill();
-        ctx.strokeStyle='white';
-        ctx.lineWidth=2;
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
         ctx.stroke();
 
-        // вложение
-        ctx.beginPath();
-        ctx.moveTo(center,center);
-        const lx = center + radius*Math.cos(sa);
-        const ly = center + radius*Math.sin(sa);
-        ctx.lineTo(lx,ly);
-        ctx.stroke();
-
-        // texte
         ctx.save();
-        ctx.translate(center,center);
-        ctx.rotate(sa+anglePerSeg/2);
-        ctx.textAlign='center';
-        ctx.textBaseline='middle';
-        ctx.fillStyle='white';
-        ctx.font='16px Arial';
-        ctx.fillText(gains[i].label,radius*0.65,0);
+        ctx.translate(center, center);
+        ctx.rotate(start + anglePerSeg / 2);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(gains[i].label, radius * 0.65, 0);
         ctx.restore();
       }
-      // points intérieurs
-      const dotN=80;
-      for(let j=0;j<dotN;j++){
-        const a=(2*Math.PI/dotN)*j;
-        const dr=radius-8;
-        const x=center+dr*Math.cos(a), y=center+dr*Math.sin(a);
+
+      // Points blancs autour à l'intérieur du cercle
+      const dotCount = 80;
+      for (let j = 0; j < dotCount; j++) {
+        const angleDot = j * 2 * Math.PI / dotCount;
+        const dotRadius = radius - 10;
+        const x = center + dotRadius * Math.cos(angleDot);
+        const y = center + dotRadius * Math.sin(angleDot);
         ctx.beginPath();
-        ctx.arc(x,y,3,0,2*Math.PI);
-        ctx.fillStyle='white';
+        ctx.arc(x, y, 3, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
         ctx.fill();
       }
+
       ctx.restore();
     }
 
-    function spin(){
-      if(isSpinning) return;
-      isSpinning=true;
-      const total= Math.random()*360+1440;
-      const dur=4000, start=performance.now();
-      function anim(t){
-        const e=(1-Math.pow(1-((t-start)/dur),3));
-        const ang= (total*e)*Math.PI/180;
-        currentAngle=ang;
-        drawWheel(ang);
-        const sway = 10*Math.sin((t-start)/dur*8*Math.PI);
-        indicator.style.transform = `rotate(${sway}deg)`;
-        if(t-start<dur) requestAnimationFrame(anim);
-        else{ isSpinning=false; showResult();}
+    function spin() {
+      if (isSpinning) return;
+      isSpinning = true;
+      const rotation = Math.random() * 360 + 1440;
+      const duration = 4000;
+      const start = performance.now();
+
+      function animate(time) {
+        const progress = Math.min((time - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const angle = (rotation * eased) * Math.PI / 180;
+        currentAngle = angle;
+        drawWheel(angle);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isSpinning = false;
+          showResult();
+        }
       }
-      requestAnimationFrame(anim);
+
+      requestAnimationFrame(animate);
     }
 
-    function showResult(){
-      const norm=(2*Math.PI - currentAngle%(2*Math.PI))%(2*Math.PI);
-      const idx=Math.floor((norm + anglePerSeg/2)/anglePerSeg)%gains.length;
-      const res=gains[idx];
+    function showResult() {
+      const normalized = (2 * Math.PI - currentAngle % (2 * Math.PI)) % (2 * Math.PI);
+      const index = Math.floor((normalized + anglePerSeg / 2) / anglePerSeg) % gains.length;
+      const result = gains[index];
 
-// Vérifie les limites mensuelles
-if (res.type === 1 && lot1Count >= maxLot1) res.win = false;
-if (res.type === 2 && lot2Count >= maxLot2) res.win = false;
-if (res.type === 3 && lot3Count >= maxLot3) res.win = false;
+      // Vérification des limites mensuelles
+      if (result.type === 1 && lot1Count >= maxLot1) result.win = false;
+      if (result.type === 2 && lot2Count >= maxLot2) result.win = false;
+      if (result.type === 3 && lot3Count >= maxLot3) result.win = false;
 
-      if (res.win) {
-  if (res.type === 1) lot1Count++;
-  if (res.type === 2) lot2Count++;
-  if (res.type === 3) lot3Count++;
+      popup.style.display = 'flex';
+      email.style.display = result.win ? 'block' : 'none';
 
+      if (result.win) {
+        if (result.type === 1) lot1Count++;
+        if (result.type === 2) lot2Count++;
+        if (result.type === 3) lot3Count++;
 
-
-      
-      popup.style.display='flex';
-      email.style.display=res.win?'block':'none';
-      if(res.win){
-        popupMsg.innerText=`Félicitations ! Vous avez gagné : ${res.label}`;
-        popupBtn.innerText="Envoyer";
+        popupMsg.innerText = `Félicitations ! Vous avez gagné : ${result.label}`;
+        popupBtn.innerText = "Envoyer";
         popupBtn.onclick = () => {
           const mail = email.value.trim();
-          if(!mail) return alert("Merci de renseigner votre e‑mail.");
-          window.location.href = `mailto:restaurant@example.com?cc=${mail}&subject=${encodeURIComponent(`[Nom] – Vous avez gagné : ${res.label}`)}&body=${encodeURIComponent(`Bravo, vous avez gagné : ${res.label}.`)}`;
+          if (!mail) return alert("Merci de renseigner votre e‑mail.");
+          window.location.href = `mailto:restaurant@example.com?cc=${mail}&subject=${encodeURIComponent(`[Nom] – Vous avez gagné : ${result.label}`)}&body=${encodeURIComponent(`Bravo, vous avez gagné : ${result.label}.`)}`;
         };
         launchConfetti();
       } else {
-        popupMsg.innerText="Désolé, vous avez perdu.";
-        popupBtn.innerText="Fermer";
-        popupBtn.onclick = ()=>popup.style.display='none';
+        popupMsg.innerText = "Désolé, vous avez perdu.";
+        popupBtn.innerText = "Fermer";
+        popupBtn.onclick = () => popup.style.display = 'none';
       }
     }
 
-    // confetti
-    const ccv = document.getElementById('confettiCanvas'),
-          cctx = ccv.getContext('2d');
-    ccv.width=window.innerWidth; ccv.height=window.innerHeight;
-    let particles=[];
-    function launchConfetti(){
-      particles=[];
-      for(let i=0;i<150;i++){
-        particles.push({
-          x:Math.random()*ccv.width,
-          y:Math.random()*-ccv.height,
-          r:Math.random()*6+4,
-          d:Math.random()*10+4,
-          color:['#f00','#0f0','#00f','#ff0'][Math.floor(Math.random()*4)],
-          tilt:Math.random()*10-5
+    // Confettis
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    const confettiCtx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    let confettiParticles = [];
+
+    function launchConfetti() {
+      confettiParticles = [];
+      for (let i = 0; i < 150; i++) {
+        confettiParticles.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * -confettiCanvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 10 + 4,
+          color: ['#f00','#0f0','#00f','#ff0'][Math.floor(Math.random()*4)],
+          tilt: Math.random() * 10 - 5
         });
       }
-      requestAnimationFrame(cfDraw);
+      requestAnimationFrame(drawConfetti);
     }
-    function cfDraw(){
-      cctx.clearRect(0,0,ccv.width,ccv.height);
-      particles.forEach(p=>{
-        cctx.beginPath();
-        cctx.fillStyle=p.color;
-        cctx.ellipse(p.x,p.y,p.r,p.r/2,p.tilt,0,2*Math.PI);
-        cctx.fill();
-        p.y+=p.d/2;
-        p.tilt+=0.1;
+
+    function drawConfetti() {
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettiParticles.forEach(p => {
+        confettiCtx.beginPath();
+        confettiCtx.fillStyle = p.color;
+        confettiCtx.ellipse(p.x, p.y, p.r, p.r / 2, p.tilt, 0, 2 * Math.PI);
+        confettiCtx.fill();
+        p.y += p.d / 2;
+        p.tilt += 0.1;
+        if (p.y > confettiCanvas.height) {
+          p.y = Math.random() * -confettiCanvas.height;
+          p.x = Math.random() * confettiCanvas.width;
+          p.tilt = Math.random() * 10 - 5;
+        }
       });
-      requestAnimationFrame(cfDraw);
+      requestAnimationFrame(drawConfetti);
     }
 
     drawWheel();
   </script>
 </body>
 </html>
-
 
 
 
