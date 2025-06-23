@@ -46,9 +46,9 @@
 
     #indicator {
       position: absolute;
-      top: calc(50% - 250px);
+      top: calc(50% - 350px);
       left: 50%;
-      transform: translateX(-50%) rotate(0deg);
+      transform: translateX(-50%) rotate(180deg);
       width: 20px;
       height: 40px;
       z-index: 2;
@@ -122,9 +122,10 @@
   <div class="content">
     <img src="logo.png" alt="Logo">
     <h1>Jouez et tentez votre chance en nous laissant un avis Google</h1>
+    <div id="lot3count">Le repas Gratuit n'a été gagné qu'une seule fois ce mois-ci - tentez votre chance !!.</div>
     <div id="indicator"></div>
     <canvas id="wheel" width="500" height="500"></canvas>
-    <div id="lot3count">Le lot 3 (le plus important) n'a été gagné qu'une seule fois ce mois-ci (juin).</div>
+    
   </div>
 
   <div id="popup">
@@ -144,7 +145,6 @@
     const radius = center;
 
     const gains = [
-      { label: '😢 Perdu', win: false },
       { label: '🎁 Lot 1', win: true, frequency: 10 },
       { label: '😢 Perdu', win: false },
       { label: '🎉 Lot 2', win: true, frequency: 15 },
@@ -153,7 +153,7 @@
       { label: '😢 Perdu', win: false }
     ];
 
-    const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0'];
+    const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4'];
     const anglePerSegment = 2 * Math.PI / gains.length;
     let currentAngle = 0;
 
