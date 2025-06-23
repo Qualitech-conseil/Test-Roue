@@ -46,7 +46,7 @@
 
     #indicator {
       position: absolute;
-      top: calc(50% - 350px);
+      top: calc(50% - 200px);
       left: 50%;
       transform: translateX(-50%) rotate(180deg);
       width: 20px;
@@ -145,6 +145,7 @@
     const radius = center;
 
     const gains = [
+      { label: '😢 Perdu', win: false }
       { label: '🎁 Lot 1', win: true, frequency: 10 },
       { label: '😢 Perdu', win: false },
       { label: '🎉 Lot 2', win: true, frequency: 15 },
@@ -153,7 +154,7 @@
       { label: '😢 Perdu', win: false }
     ];
 
-    const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4'];
+    const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4','#ffe119'];
     const anglePerSegment = 2 * Math.PI / gains.length;
     let currentAngle = 0;
 
