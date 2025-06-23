@@ -88,7 +88,7 @@
   <div class="content">
     <img src="logo.png" alt="Logo" />
     <h1>Jouez et tentez votre chance en nous laissant un avis Google</h1>
-    <div id="lot3count">Le repas gratuit a été gagné une seule fois ce mois-ci - il est peut êter pour vous !!!.</div>
+    <div id="lot3count">Le repas gratuit a été gagné une seule fois ce mois-ci - il est peut être pour vous !!!.</div>
     <canvas id="wheel" width="500" height="500"></canvas>
     <div id="indicator"></div>
   </div>
@@ -198,14 +198,14 @@
     function spin() {
       if (isSpinning) return;
       isSpinning = true;
-      const rotation = Math.random() * 360 + 1380;
+      const rotation = Math.random() * 360 + 1440;
       const duration = 4000;
       const start = performance.now();
 
       function animate(time) {
         const progress = Math.min((time - start) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        const angle = (rotation * eased) * Math.PI / 180;
+        const angle = (rotation * eased) * Math.PI / 120;
         currentAngle = angle;
         drawWheel(angle);
 
