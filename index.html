@@ -50,6 +50,7 @@
       width: 6px;
       height: 40px;
       background: red;
+      animation: swing 0.3s ease-in-out infinite alternate;
       border-radius: 3px;
       z-index: 5;
       pointer-events: none;
@@ -119,6 +120,14 @@
       {label:'😢 Perdu', win:false}
     ];
 
+ const winLimits = {
+      lot1: {limit: 7, count: 0}, // café par jour
+      lot2: {limit: 2, count: 0}, // plat tous les 4 jours
+      lot3: {limit: 1, count: 0}  // repas par semaine
+    };
+
+
+    
     const colors = ['#3cb44b', '#e6194b', '#4363d8', '#e6194b', '#911eb4', '#e6194b'];
     const anglePerSeg = 2 * Math.PI / gains.length;
 
