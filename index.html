@@ -1,137 +1,111 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Roue de la Fortune</title>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+      margin: 0; padding: 0; height: 100%;
       font-family: Arial, sans-serif;
-      background: url(''https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1950&q=80'') center/cover no-repeat;
+      background: url('https://www.domaine-sol-payre.com/wp-content/uploads/restauration-copie.jpg') center/cover no-repeat;
       overflow-x: hidden;
+      position: relative;
     }
-
     .overlay {
-      position: absolute;
-      top: 0; left: 0;
+      position: absolute; top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.4);
       backdrop-filter: blur(4px);
       z-index: 0;
+      pointer-events: none;
     }
-
     .content {
-      position: relative;
-      z-index: 1;
-      color: white;
-      text-align: center;
-      padding: 20px;
+      position: relative; z-index: 1;
+      color: white; text-align: center;
+      padding: 20px 20px 0;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; box-sizing: border-box;
     }
-
     .content img {
-      width: 100px;
-      max-width: 30vw;
-      height: auto;
+      width: 200px; max-width: 50vw;
+      height: auto; margin-bottom: 15px;
     }
-
+    h1 {
+      margin-bottom: 20px;
+    }
+    #lot3count {
+      margin: 15px 0; font-weight: bold; font-size: 1.1rem;
+    }
     canvas#wheel {
-      width: 90vw;
-      height: 90vw;
-      max-width: 500px;
-      max-height: 500px;
+      width: 90vw; height: 90vw;
+      max-width: 500px; max-height: 500px;
+      margin-top: 15px;
     }
-
     #indicator {
       position: absolute;
-      top: calc(50% - 250px);
+      top: calc(50% - 250px); /* ajustable si besoin */
       left: 50%;
-      transform: translateX(-50%) rotate(180deg);
-      width: 20px;
-      height: 40px;
-      z-index: 2;
+      transform: translateX(-50%);
+      width: 24px; height: 48px;
+      z-index: 5;
+      pointer-events: none;
     }
-
     #indicator::after {
-      content: '';
-      display: block;
-      width: 20px;
-      height: 40px;
+      content: ''; display: block;
+      width: 24px; height: 48px;
       background: red;
-      border-radius: 60% 60% 40% 40% / 80% 80% 20% 20%;
-      animation: tapFlex 0.2s ease-in-out infinite alternate;
+      border-radius: 50% 50% 60% 40% / 40% 60% 50% 50%;
+      transform-origin: center bottom;
+      animation: sway 0.4s ease-in-out infinite alternate;
+      box-shadow: 0 0 5px rgba(255,0,0,0.7);
     }
-
-    @keyframes tapFlex {
+    @keyframes sway {
       from { transform: rotate(-10deg); }
       to { transform: rotate(10deg); }
     }
-
     #popup {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-      padding: 20px;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 9999; padding: 20px; box-sizing: border-box;
     }
-
     #popupContent {
-      background: white;
-      color: black;
-      padding: 20px;
-      text-align: center;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
+      background: white; color: black;
+      padding: 20px; border-radius: 10px;
+      width: 100%; max-width: 400px; box-sizing: border-box;
+    }
+    #popupContent input, #popupContent button {
+      width: 100%; padding: 12px; margin-top: 10px; font-size: 1em;
       box-sizing: border-box;
     }
-
-    #popupContent input, #popupContent button {
-      margin-top: 10px;
-      width: calc(100% - 24px);
-      padding: 12px;
-      font-size: 1em;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
     .confetti {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 1000;
+      pointer-events: none; z-index: 10000;
     }
-
-    #lot3count {
-      color: white;
-      font-weight: bold;
-      margin-top: 20px;
+    @media (max-width:600px) {
+      .content img { width: 150px; }
+      h1 { font-size: 1.3rem; }
+      #lot3count { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
   <div class="overlay"></div>
   <div class="content">
-    <img src="logo.png" alt="Logo">
+    <img src="logo.png" alt="Logo" />
     <h1>Jouez et tentez votre chance en nous laissant un avis Google</h1>
-    <div id="lot3count">Le repas Gratuit n'a été gagné qu'une seule fois ce mois-ci - tentez votre chance !!.</div>
-    <div id="indicator"></div>
+    <div id="lot3count">Le lot 3 (le plus important) n'a été gagné qu'une seule fois ce mois-ci (juin).</div>
     <canvas id="wheel" width="500" height="500"></canvas>
-    
+    <div id="indicator"></div>
   </div>
 
   <div id="popup">
     <div id="popupContent">
       <h2 id="popupMessage">Veuillez laisser un avis Google pour pouvoir jouer.</h2>
-      <input type="email" id="emailInput" placeholder="Votre adresse e-mail" style="display:none;">
+      <input type="email" id="emailInput" placeholder="Votre adresse e-mail" style="display:none;" />
       <button id="popupBtn">Laisser un avis Google</button>
     </div>
   </div>
@@ -141,160 +115,177 @@
   <script>
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
-    const center = canvas.width / 2;
-    const radius = center;
+    const center = canvas.width/2, radius = center;
 
     const gains = [
-      { label: '🎁 Lot 1', win: true, frequency: 10 },
-      { label: '😢 Perdu', win: false },
-      { label: '🎉 Lot 2', win: true, frequency: 15 },
-      { label: '😢 Perdu', win: false },
-      { label: '🏆 Lot 3', win: true, frequency: 50 },
-      { label: '😢 Perdu', win: false }
+      {label:'😢 Perdu',win:false},
+      {label:'🎁 Lot 1',win:true},
+      {label:'😢 Perdu',win:false},
+      {label:'🎉 Lot 2',win:true},
+      {label:'😢 Perdu',win:false},
+      {label:'🏆 Lot 3',win:true},
+      {label:'😢 Perdu',win:false}
     ];
+    const colors = ['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4','#46f0f0'];
+    const anglePerSeg = 2*Math.PI/gains.length;
 
-    const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4'];
-    const anglePerSegment = 2 * Math.PI / gains.length;
-    let currentAngle = 0;
+    // Positioner languette
+    const indicator = document.getElementById('indicator');
+    function posInd() {
+      const rect = canvas.getBoundingClientRect();
+      indicator.style.top = `${rect.top + window.scrollY}px`;
+      indicator.style.left = `${rect.left + window.scrollX + rect.width/2 - 12}px`;
+    }
+    window.addEventListener('load',posInd);
+    window.addEventListener('resize',posInd);
 
-    const popup = document.getElementById('popup');
-    const popupBtn = document.getElementById('popupBtn');
-    const popupMessage = document.getElementById('popupMessage');
-    const emailInput = document.getElementById('emailInput');
-    const avisGoogleURL = "https://g.page/r/VOTRE-LIEN-D-AVIS-GOOGLE";
+    let currentAngle=0, isSpinning=false, popupStep=1;
 
-    let popupStep = 1;
+    const popup = document.getElementById('popup'),
+          popupBtn = document.getElementById('popupBtn'),
+          popupMsg = document.getElementById('popupMessage'),
+          email = document.getElementById('emailInput'),
+          avisURL = "https://g.page/r/VOTRE-LIEN-D-AVIS-GOOGLE";
 
     popupBtn.onclick = () => {
-      if (popupStep === 1) {
-        window.open(avisGoogleURL, '_blank');
-        popupMessage.innerText = "Vous pouvez maintenant tenter votre chance.";
-        popupBtn.innerText = "Tourner la roue";
-        popupStep = 2;
-      } else if (popupStep === 2) {
-        popup.style.display = 'none';
-        popupStep = 3;
-        spinWheel();
+      if(popupStep===1){
+        window.open(avisURL,'_blank');
+        popupMsg.innerText="Vous pouvez maintenant tenter votre chance.";
+        popupBtn.innerText="Tourner la roue";
+        popupStep=2;
+      } else if(popupStep===2 && !isSpinning){
+        popup.style.display='none';
+        spin();
       }
     };
 
-    function drawWheel() {
-      for (let i = 0; i < gains.length; i++) {
-        const startAngle = i * anglePerSegment;
-        const endAngle = startAngle + anglePerSegment;
-
+    function drawWheel(rot=0){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.save();
+      ctx.translate(center,center);
+      ctx.rotate(rot);
+      ctx.translate(-center,-center);
+      for(let i=0;i<gains.length;i++){
+        let sa=i*anglePerSeg, ea=sa+anglePerSeg;
         ctx.beginPath();
-        ctx.moveTo(center, center);
-        ctx.arc(center, center, radius, startAngle, endAngle);
-        ctx.fillStyle = colors[i % colors.length];
+        ctx.moveTo(center,center);
+        ctx.arc(center,center,radius,sa,ea);
+        ctx.fillStyle=colors[i];
         ctx.fill();
+        ctx.strokeStyle='white';
+        ctx.lineWidth=2;
         ctx.stroke();
 
+        // вложение
+        ctx.beginPath();
+        ctx.moveTo(center,center);
+        const lx = center + radius*Math.cos(sa);
+        const ly = center + radius*Math.sin(sa);
+        ctx.lineTo(lx,ly);
+        ctx.stroke();
+
+        // texte
         ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(startAngle + anglePerSegment / 2);
-        ctx.textAlign = 'center';
-        ctx.fillStyle = 'white';
-        ctx.font = '16px Arial';
-        ctx.fillText(gains[i].label, radius * 0.65, 5);
+        ctx.translate(center,center);
+        ctx.rotate(sa+anglePerSeg/2);
+        ctx.textAlign='center';
+        ctx.textBaseline='middle';
+        ctx.fillStyle='white';
+        ctx.font='16px Arial';
+        ctx.fillText(gains[i].label,radius*0.65,0);
         ctx.restore();
       }
-    }
-
-    function spinWheel() {
-      const spinAngle = Math.random() * 360 + 1440;
-      const duration = 4000;
-      const start = performance.now();
-
-      function animate(time) {
-        const elapsed = time - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 3);
-        const angle = (spinAngle * ease) * Math.PI / 180;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        ctx.translate(center, center);
-        ctx.rotate(angle);
-        ctx.translate(-center, -center);
-        drawWheel();
-        ctx.restore();
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          currentAngle = angle % (2 * Math.PI);
-          showResult();
-        }
+      // points intérieurs
+      const dotN=80;
+      for(let j=0;j<dotN;j++){
+        const a=(2*Math.PI/dotN)*j;
+        const dr=radius-8;
+        const x=center+dr*Math.cos(a), y=center+dr*Math.sin(a);
+        ctx.beginPath();
+        ctx.arc(x,y,3,0,2*Math.PI);
+        ctx.fillStyle='white';
+        ctx.fill();
       }
-
-      requestAnimationFrame(animate);
+      ctx.restore();
     }
 
-    function showResult() {
-      const normalizedAngle = (2 * Math.PI - (currentAngle + anglePerSegment / 2)) % (2 * Math.PI);
-      const index = Math.floor((normalizedAngle / anglePerSegment)) % gains.length;
-      const result = gains[index];
+    function spin(){
+      if(isSpinning) return;
+      isSpinning=true;
+      const total= Math.random()*360+1440;
+      const dur=4000, start=performance.now();
+      function anim(t){
+        const e=(1-Math.pow(1-((t-start)/dur),3));
+        const ang= (total*e)*Math.PI/180;
+        currentAngle=ang;
+        drawWheel(ang);
+        const sway = 10*Math.sin((t-start)/dur*8*Math.PI);
+        indicator.style.transform = `rotate(${sway}deg)`;
+        if(t-start<dur) requestAnimationFrame(anim);
+        else{ isSpinning=false; showResult();}
+      }
+      requestAnimationFrame(anim);
+    }
 
-      popup.style.display = 'flex';
-      emailInput.style.display = result.win ? 'block' : 'none';
-
-      if (result.win) {
-        popupMessage.innerText = `Félicitations ! Vous avez gagné le lot : ${result.label}`;
-        popupBtn.innerText = "Envoyer";
+    function showResult(){
+      const norm=(2*Math.PI - currentAngle%(2*Math.PI))%(2*Math.PI);
+      const idx=Math.floor((norm + anglePerSeg/2)/anglePerSeg)%gains.length;
+      const res=gains[idx];
+      popup.style.display='flex';
+      email.style.display=res.win?'block':'none';
+      if(res.win){
+        popupMsg.innerText=`Félicitations ! Vous avez gagné : ${res.label}`;
+        popupBtn.innerText="Envoyer";
         popupBtn.onclick = () => {
-          const email = emailInput.value.trim();
-          if (!email) return alert("Merci de renseigner votre adresse e-mail.");
-          const subject = encodeURIComponent(`[Nom du restaurant] – Vous avez gagné : ${result.label}`);
-          const body = encodeURIComponent(`Félicitations ! Vous avez remporté le lot : ${result.label}. Votre gain est valable 2 mois.`);
-          window.location.href = `mailto:restaurant@example.com?cc=${email}&subject=${subject}&body=${body}`;
+          const mail = email.value.trim();
+          if(!mail) return alert("Merci de renseigner votre e‑mail.");
+          window.location.href = `mailto:restaurant@example.com?cc=${mail}&subject=${encodeURIComponent(`[Nom] – Vous avez gagné : ${res.label}`)}&body=${encodeURIComponent(`Bravo, vous avez gagné : ${res.label}.`)}`;
         };
         launchConfetti();
       } else {
-        popupMessage.innerText = "Désolé, vous avez perdu cette fois-ci.";
-        popupBtn.innerText = "Fermer";
-        popupBtn.onclick = () => popup.style.display = 'none';
+        popupMsg.innerText="Désolé, vous avez perdu.";
+        popupBtn.innerText="Fermer";
+        popupBtn.onclick = ()=>popup.style.display='none';
       }
     }
 
-    const confettiCanvas = document.getElementById('confettiCanvas');
-    const confettiCtx = confettiCanvas.getContext('2d');
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
-    let confettiParticles = [];
-
-    function launchConfetti() {
-      confettiParticles = [];
-      for (let i = 0; i < 150; i++) {
-        confettiParticles.push({
-          x: Math.random() * confettiCanvas.width,
-          y: Math.random() * -confettiCanvas.height,
-          r: Math.random() * 6 + 4,
-          d: Math.random() * 10 + 4,
-          color: ['#f00','#0f0','#00f','#ff0'][Math.floor(Math.random()*4)],
-          tilt: Math.random() * 10 - 5
+    // confetti
+    const ccv = document.getElementById('confettiCanvas'),
+          cctx = ccv.getContext('2d');
+    ccv.width=window.innerWidth; ccv.height=window.innerHeight;
+    let particles=[];
+    function launchConfetti(){
+      particles=[];
+      for(let i=0;i<150;i++){
+        particles.push({
+          x:Math.random()*ccv.width,
+          y:Math.random()*-ccv.height,
+          r:Math.random()*6+4,
+          d:Math.random()*10+4,
+          color:['#f00','#0f0','#00f','#ff0'][Math.floor(Math.random()*4)],
+          tilt:Math.random()*10-5
         });
       }
-      requestAnimationFrame(drawConfetti);
+      requestAnimationFrame(cfDraw);
     }
-
-    function drawConfetti() {
-      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-      confettiParticles.forEach(p => {
-        confettiCtx.beginPath();
-        confettiCtx.fillStyle = p.color;
-        confettiCtx.ellipse(p.x, p.y, p.r, p.r / 2, p.tilt, 0, 2 * Math.PI);
-        confettiCtx.fill();
-        p.y += p.d / 2;
-        p.tilt += 0.1;
+    function cfDraw(){
+      cctx.clearRect(0,0,ccv.width,ccv.height);
+      particles.forEach(p=>{
+        cctx.beginPath();
+        cctx.fillStyle=p.color;
+        cctx.ellipse(p.x,p.y,p.r,p.r/2,p.tilt,0,2*Math.PI);
+        cctx.fill();
+        p.y+=p.d/2;
+        p.tilt+=0.1;
       });
-      requestAnimationFrame(drawConfetti);
+      requestAnimationFrame(cfDraw);
     }
 
     drawWheel();
   </script>
 </body>
 </html>
+
 
 
 
