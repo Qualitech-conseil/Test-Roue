@@ -116,16 +116,26 @@
     const canvas = document.getElementById('wheel');
     const ctx = canvas.getContext('2d');
     const center = canvas.width/2, radius = center;
+    
+// Limites mensuelles de gain pour chaque lot (modifiable)
+const maxLot1 = 3;  // Lot 1 autorisé 3 fois par mois
+const maxLot2 = 2;  // Lot 2 autorisé 2 fois par mois
+const maxLot3 = 1;  // Lot 3 autorisé 1 fois par mois
 
+let lot1Count = 0;
+let lot2Count = 0;
+let lot3Count = 0;
+    
     const gains = [
-      {label:'😢 Perdu',win:false},
-      {label:'🎁 Lot 1',win:true},
-      {label:'😢 Perdu',win:false},
-      {label:'🎉 Lot 2',win:true},
-      {label:'😢 Perdu',win:false},
-      {label:'🏆 Lot 3',win:true},
-      
-    ];
+  {label:'😢 Perdu',win:false},
+  {label:'🎁 Lot 1',win:true, type:1},
+  {label:'😢 Perdu',win:false},
+  {label:'🎉 Lot 2',win:true, type:2},
+  {label:'😢 Perdu',win:false},
+  {label:'🏆 Lot 3',win:true, type:3},
+  {label:'😢 Perdu',win:false}
+];
+
     const colors = ['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4'];
     const anglePerSeg = 2*Math.PI/gains.length;
 
@@ -231,6 +241,20 @@
       const norm=(2*Math.PI - currentAngle%(2*Math.PI))%(2*Math.PI);
       const idx=Math.floor((norm + anglePerSeg/2)/anglePerSeg)%gains.length;
       const res=gains[idx];
+
+// Vérifie les limites mensuelles
+if (res.type === 1 && lot1Count >= maxLot1) res.win = false;
+if (res.type === 2 && lot2Count >= maxLot2) res.win = false;
+if (res.type === 3 && lot3Count >= maxLot3) res.win = false;
+
+      if (res.win) {
+  if (res.type === 1) lot1Count++;
+  if (res.type === 2) lot2Count++;
+  if (res.type === 3) lot3Count++;
+
+
+
+      
       popup.style.display='flex';
       email.style.display=res.win?'block':'none';
       if(res.win){
