@@ -13,7 +13,7 @@
       position: relative;
     }
     .overlay {
-      position: absolute; top: 0; left: 0;
+      position: absolute; top: 0; left: 0;  
       width: 100%; height: 100%;
       background: rgba(0,0,0,0.4);
       backdrop-filter: blur(4px);
@@ -88,7 +88,7 @@
   <div class="content">
     <img src="logo.png" alt="Logo" />
     <h1>Jouez et tentez votre chance en nous laissant un avis Google</h1>
-    <div id="lot3count">Le lot 3 (le plus important) n'a été gagné qu'une seule fois ce mois-ci (juin).</div>
+    <div id="lot3count">Le repas gratuit a été gagné une seule fois ce mois-ci - il est peut êter pour vous !!!.</div>
     <canvas id="wheel" width="500" height="500"></canvas>
     <div id="indicator"></div>
   </div>
@@ -130,7 +130,7 @@
     const popupBtn = document.getElementById('popupBtn');
     const popupMsg = document.getElementById('popupMessage');
     const email = document.getElementById('emailInput');
-    const avisURL = "https://g.page/r/VOTRE-LIEN-D-AVIS-GOOGLE";
+    const avisURL = "https://www.google.com/search?client=firefox-b-d&sca_esv=ac60e713747e51d1&q=domaine+sol+payr%C3%A9&si=AMgyJEuzsz2NflaaWzrzdpjxXXRaJ2hfdMsbe_mSWso6src8s_V2dAn1SgYwA0t4-2e3O78LiO1M9TvZ0GrFHwJ_rMTtDhaQ4Ivo2YUe_06m8eyz3NNxd0w%3D&uds=AOm0WdGidOdjVhBHIqi6IfHFtxCD-pFhDw12wehonGwc8hQQwj2fv8AgrhQm0jyg8xDOojLspLjfdtGGBkbn7kEKv98O_lGI_QDawxLRqq68h0VlRhHMfq0&sa=X&ved=2ahUKEwj5uq2MroiOAxVHRKQEHRhSHzgQ3PALegQIHRAE&biw=1536&bih=777&dpr=1.25";
 
     // Limites mensuelles par lot
     const maxLot1 = 3, maxLot2 = 2, maxLot3 = 1;
