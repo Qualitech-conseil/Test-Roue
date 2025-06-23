@@ -44,7 +44,7 @@
     }
     #indicator {
       position: absolute;
-      top: calc(50% - 150px); /* Ajusté pour être en haut de la roue */
+      top: calc(50% - 165px); /* Ajusté pour être en haut de la roue */
       left: 50%;
       transform: translateX(-50%);
       width: 6px;
@@ -111,11 +111,11 @@
 
     // Segments : alternance Lot/perdu dans l'ordre
     const gains = [
-      {label:'🎁 Lot 1', win:true, type:1},
+      {label:'🎁 Lot 2', win:true, type:1},
       {label:'😢 Perdu', win:false},
-      {label:'🎉 Lot 2', win:true, type:2},
+      {label:'🎉 Lot 3', win:true, type:2},
       {label:'😢 Perdu', win:false},
-      {label:'🏆 Lot 3', win:true, type:3},
+      {label:'🏆 Lot 1', win:true, type:3},
       {label:'😢 Perdu', win:false}
     ];
 
@@ -133,7 +133,7 @@
     const avisURL = "https://www.google.com/search?client=firefox-b-d&sca_esv=ac60e713747e51d1&q=domaine+sol+payr%C3%A9&si=AMgyJEuzsz2NflaaWzrzdpjxXXRaJ2hfdMsbe_mSWso6src8s_V2dAn1SgYwA0t4-2e3O78LiO1M9TvZ0GrFHwJ_rMTtDhaQ4Ivo2YUe_06m8eyz3NNxd0w%3D&uds=AOm0WdGidOdjVhBHIqi6IfHFtxCD-pFhDw12wehonGwc8hQQwj2fv8AgrhQm0jyg8xDOojLspLjfdtGGBkbn7kEKv98O_lGI_QDawxLRqq68h0VlRhHMfq0&sa=X&ved=2ahUKEwj5uq2MroiOAxVHRKQEHRhSHzgQ3PALegQIHRAE&biw=1536&bih=777&dpr=1.25";
 
     // Limites mensuelles par lot
-    const maxLot1 = 3, maxLot2 = 2, maxLot3 = 1;
+    const maxLot1 = 1, maxLot2 = 2, maxLot3 = 3;
     let lot1Count = 0, lot2Count = 0, lot3Count = 0;
 
     popupBtn.onclick = () => {
